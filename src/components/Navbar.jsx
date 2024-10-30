@@ -34,6 +34,11 @@ const Navbar = () => {
                   
               </div>
             </NavLink>
+
+            
+            <NavLink to="/signup">
+              <p>Signup</p>
+            </NavLink>
             
           </div>
       </nav>
