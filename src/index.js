@@ -7,13 +7,16 @@ import "./index.css";
 import { store } from "./redux/Store";
 import { ToastContainer } from "react-toastify";
 import { Toaster } from "react-hot-toast";
+import { WishlistProvider } from './context/WishlistContext'; // Import WishlistProvider
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
     <BrowserRouter>
         <Provider store={store}>
-          <App />   
+        <WishlistProvider>
+        <App />   
+        </WishlistProvider>
           <Toaster/>  
         </Provider>
     </BrowserRouter>
