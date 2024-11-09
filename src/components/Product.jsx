@@ -148,3 +148,6 @@ const Product = ({ post }) => {
 
 export default Product;
 
+
+
+
