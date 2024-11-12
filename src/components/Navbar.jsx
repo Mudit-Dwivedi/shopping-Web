@@ -296,24 +296,131 @@
 // export default Navbar;
 
 
-import { FaShoppingCart } from "react-icons/fa";
+// import { FaShoppingCart } from "react-icons/fa";
+// import { useSelector } from "react-redux";
+// import { NavLink, useNavigate, useLocation } from "react-router-dom";
+// import { useEffect, useState } from "react";
+// import { useWishlist } from "../context/WishlistContext";
+
+// const Navbar = () => {
+//   const { cart } = useSelector((state) => state);
+//   const [isLoggedIn, setIsLoggedIn] = useState(false);
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const { clearWishlist } = useWishlist(); // Import clearWishlist
+
+//   // Function to check login status
+//   const checkLoginStatus = () => {
+//     const authToken = localStorage.getItem("authToken");
+//     const loginCookie = document.cookie.includes("authCookie"); // Adjust "authCookie" to your cookie name
+//     setIsLoggedIn(!!authToken || loginCookie);
+//   };
+
+//   // Check login status on mount and when location changes
+//   useEffect(() => {
+//     checkLoginStatus();
+
+//     // Listen for storage changes from other tabs
+//     window.addEventListener("storage", checkLoginStatus);
+
+//     return () => {
+//       window.removeEventListener("storage", checkLoginStatus);
+//     };
+//   }, [location]);
+
+//   const handleLogout = () => {
+//     // Remove auth token and clear cookie
+//     localStorage.removeItem("authToken");
+    
+//     document.cookie = "authCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+//     //clearWishlist();
+//     setIsLoggedIn(false); // Update local state
+//     navigate("/login");
+
+    
+//   };
+
+//   return (
+//     <div>
+//       <nav className="flex justify-between items-center h-20 max-w-6xl mx-auto">
+//         <NavLink to="/">
+//           <div className="ml-5">
+//             <img src="../logo.png" className="h-14" alt="Logo" />
+//           </div>
+//         </NavLink>
+
+//         <div className="flex items-center font-medium text-slate-100 mr-5 space-x-6">
+//           <NavLink to="/">
+//             <p>Home</p>
+//           </NavLink>
+
+//           <NavLink to="/cart">
+//             <div className="relative">
+//               <FaShoppingCart className="text-2xl" />
+//               {cart.length > 0 && (
+//                 <span
+//                   className="absolute -top-1 -right-2 bg-green-600 text-xs w-5 h-5 flex 
+//                   justify-center items-center animate-bounce rounded-full text-white"
+//                 >
+//                   {cart.length}
+//                 </span>
+//               )}
+//             </div>
+//           </NavLink>
+
+//           {isLoggedIn ? (
+//             <button onClick={handleLogout} className="text-red-500">
+//               Logout
+//             </button>
+//           ) : (
+//             <NavLink to="/signup">
+//               <p>Signup</p>
+//             </NavLink>
+//           )}
+//         </div>
+//       </nav>
+//     </div>
+//   );
+// };
+
+// export default Navbar;
+
+
+
+
+
+
 import { useSelector } from "react-redux";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useWishlist } from "../context/WishlistContext";
+import { FaShoppingCart } from "react-icons/fa";
+
+import { useDispatch } from "react-redux";
+import { clearCart } from "../redux/Slices/CartSlice"; // Make sure the path is correct
 
 const Navbar = () => {
   const { cart } = useSelector((state) => state);
+  const dispatch = useDispatch();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { clearWishlist } = useWishlist(); // Import clearWishlist
+  const { clearUser, setUser, isLoggedIn: wishlistLoggedIn } = useWishlist();
 
-  // Function to check login status
+  // Function to check login status and load the wishlist if the user is logged in
   const checkLoginStatus = () => {
     const authToken = localStorage.getItem("authToken");
-    const loginCookie = document.cookie.includes("authCookie"); // Adjust "authCookie" to your cookie name
-    setIsLoggedIn(!!authToken || loginCookie);
+    const loginCookie = document.cookie.includes("authCookie");
+    const loggedIn = !!authToken || loginCookie;
+
+    if (loggedIn) {
+      const storedUserId = localStorage.getItem("userId");
+      if (storedUserId) {
+        setUser(storedUserId); // Load wishlist for the user
+      }
+    }
+
+    setIsLoggedIn(loggedIn);
   };
 
   // Check login status on mount and when location changes
@@ -331,13 +438,13 @@ const Navbar = () => {
   const handleLogout = () => {
     // Remove auth token and clear cookie
     localStorage.removeItem("authToken");
-    
     document.cookie = "authCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    //clearWishlist();
-    setIsLoggedIn(false); // Update local state
-    navigate("/login");
 
-    
+    // Clear user data and wishlist
+    clearUser(); // This will also clear the wishlist immediately
+    dispatch(clearCart()); // Clear the cart
+    setIsLoggedIn(false);
+    navigate("/login");
   };
 
   return (
@@ -352,6 +459,10 @@ const Navbar = () => {
         <div className="flex items-center font-medium text-slate-100 mr-5 space-x-6">
           <NavLink to="/">
             <p>Home</p>
+          </NavLink>
+          
+          <NavLink to="/wishlist">
+            <p>wishlist</p>
           </NavLink>
 
           <NavLink to="/cart">
